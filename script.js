@@ -3,6 +3,10 @@ const ctx = canvas.getContext('2d');
 const scoreElement = document.getElementById('score');
 const gameOverElement = document.getElementById('gameOver');
 
+const gameOverSound = document.getElementById('gameOverSound');
+const backgroundSound = document.getElementById('backgroundSound');
+const eatSound = document.getElementById('eatSound');
+
 const gridSize = 20;
 const gridWidth = canvas.width / gridSize;
 const gridHeight = canvas.height / gridSize;
@@ -13,11 +17,24 @@ let direction = 'right';
 let score = 0;
 let gameRunning = true;
 
+// ================= BACKGROUND IMAGE =================
+// Ganti nama file dengan file gambar yang kamu simpan di folder
+const backgroundImg = new Image();
+backgroundImg.src = "bg.jpg"; // <--- masukkan nama file gambar di sini
+
 // ================= DRAW =================
 function draw() {
-    // Bersihkan canvas
-    ctx.fillStyle = "#fdcdcd";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Gambar background
+    if (backgroundImg.complete) {
+        ctx.drawImage(backgroundImg, 0, 0, canvas.width, canvas.height);
+    } else {
+        ctx.fillStyle = "#88cbe3"; 
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Latar belakang grid ular
+    ctx.fillStyle = "rgba(253, 205, 205, 0.6)";
+    ctx.fillRect(0, 0, gridWidth * gridSize, gridHeight * gridSize);
 
     // Gambar ular
     ctx.fillStyle = "green";
@@ -57,6 +74,10 @@ function update() {
     if (head.x === food.x && head.y === food.y) {
         score += 10;
         scoreElement.textContent = score;
+
+        eatSound.currentTime = 0;
+        eatSound.play();
+
         generateFood();
     } else {
         snake.pop();
@@ -75,6 +96,9 @@ function generateFood() {
 function endGame() {
     gameRunning = false;
     gameOverElement.style.display = 'block';
+    backgroundSound.pause();
+    gameOverSound.currentTime = 0;
+    gameOverSound.play();
 }
 
 // ================= RESET GAME =================
@@ -86,6 +110,8 @@ function resetGame() {
     gameRunning = true;
     gameOverElement.style.display = 'none';
     generateFood();
+    backgroundSound.currentTime = 0;
+    backgroundSound.play();
 }
 
 // ================= GAME LOOP =================
